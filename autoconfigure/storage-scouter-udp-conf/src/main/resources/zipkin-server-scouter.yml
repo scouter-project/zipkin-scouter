@@ -1,0 +1,9 @@
+# When enabled, this allows shorter env properties (ex -Dspring.profiles.active=scouter)
+zipkin:
+  storage:
+    scouter:
+      # Scouter collector address
+      scouter-collector-address: ${SCOUTER_COLLECTOR_ADDR:127.0.0.1}
+      # Scouter collector port
+      scouter-collector-port: ${SCOUTER_COLLECTOR_PORT:6100}
+      scouter-udp-packet-max-bytes: ${SCOUTER_UDP_PACKET_MAX_BYTES:60000}
