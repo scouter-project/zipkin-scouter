@@ -18,21 +18,26 @@ package zipkin2.storage.scouter.udp.net;
 
 import scouter.io.DataOutputX;
 import scouter.lang.TextTypes;
+import scouter.lang.pack.ObjectPack;
 import scouter.lang.pack.Pack;
 import scouter.lang.pack.SpanContainerPack;
 import scouter.lang.pack.SpanPack;
 import scouter.lang.pack.SpanTypes;
 import scouter.lang.pack.TextPack;
 import scouter.lang.pack.XLogPack;
+import scouter.lang.pack.XLogTypes;
 import scouter.lang.value.ListValue;
 import scouter.lang.value.MapValue;
 import scouter.util.HashUtil;
 import scouter.util.IntIntLinkedMap;
 import scouter.util.IntLinkedSet;
+import scouter.util.IntLongLinkedMap;
+import scouter.util.StringUtil;
 import zipkin2.Annotation;
 import zipkin2.Endpoint;
 import zipkin2.Span;
 import zipkin2.internal.HexCodec;
+import zipkin2.storage.scouter.ScouterConstants;
 
 import java.io.IOException;
 import java.util.List;
@@ -85,14 +90,42 @@ public class DataProxy {
 	}
 
 	private static IntLinkedSet objNameSet = new IntLinkedSet().setMax(10000);
+
+	private static IntLongLinkedMap objSentMap = new IntLongLinkedMap().setMax(1000);
+	public static void registerZipkinObj(Span span) {
+		String objName = ScouterConstants.toScouterObjName(span.localServiceName());
+		int objHash = HashUtil.hash(objName);
+
+		long registered = objSentMap.get(objHash);
+		long now = System.currentTimeMillis();
+		if (registered != 0 && now - registered < 30 * 1000) {
+			return;
+		}
+
+		ObjectPack p = new ObjectPack();
+		p.objType = "zipkin";
+		p.objName = objName;
+		p.objHash = objHash;
+		if (span.localEndpoint() != null) {
+			p.address = span.localEndpoint().ipv4() + ":" + span.localEndpoint().portAsInt();
+		}
+		objSentMap.put(objHash, now);
+		sendHeartBeat(p);
+	}
+
+	public static void sendHeartBeat(ObjectPack p) {
+		udpCollect.add(p);
+	}
+
 	public static int sendObjName(String objName) {
 		if (objName == null) {
 			return 0;
 		}
 		int hash = HashUtil.hash(objName);
-		sendObjName(hash,objName);
+		sendObjName(hash, objName);
 		return hash;
 	}
+
 	public static void sendObjName(int hash, String objName) {
 		if (objName == null) {
 			return;
@@ -164,19 +197,30 @@ public class DataProxy {
 		if (spans == null || spans.size() == 0)
 			return;
 
-		Map<String, List<Span>> spansById = spans.stream().collect(Collectors.groupingBy(Span::traceId));
+		Map<String, List<Span>> spansById = spans.stream()
+				.collect(Collectors.groupingBy(Span::traceId));
 
 		for (Map.Entry<String, List<Span>> entry : spansById.entrySet()) {
 			SpanContainerPack containerPack = new SpanContainerPack();
 			containerPack.gxid = HexCodec.lowerHexToUnsignedLong(entry.getKey());
 			containerPack.spanCount = entry.getValue().size();
 
-			List<SpanPack> spanPacks = entry.getValue().stream().map(DataProxy::makeSpanPack).collect(Collectors.toList());
-			List<byte[]> spansBytesList = SpanPack.toBytesList(spanPacks, udpMaxBytes);
+			List<Span> spanList = entry.getValue();
+			spanList.forEach(DataProxy::registerZipkinObj);
 
+			List<SpanPack> spanPacks = spanList.stream()
+					.map(DataProxy::makeSpanPack).collect(Collectors.toList());
+
+			List<byte[]> spansBytesList = SpanPack.toBytesList(spanPacks, udpMaxBytes);
 			for (byte[] spansBytes : spansBytesList) {
 				containerPack.spans = spansBytes;
 				sendDirect(containerPack);
+			}
+
+			for(SpanPack spanPack : spanPacks) {
+				if(SpanTypes.isXLoggable(spanPack.spanType)) {
+					sendXLog(makeXLogPack(spanPack));
+				}
 			}
 		}
 	}
@@ -210,9 +254,15 @@ public class DataProxy {
 		}
 
 		pack.name = sendServiceName(span.name());
+		String error = span.tags().get("error");
+		if (StringUtil.isNotEmpty(error)) {
+			pack.error = sendError(error);
+		}
 
 		Endpoint localEndPoint = span.localEndpoint();
 		Endpoint remoteEndPoint = span.remoteEndpoint();
+
+		pack.objHash = sendObjName(ScouterConstants.toScouterObjName(span.localServiceName()));
 		pack.localEndpointServiceName = sendObjName(span.localServiceName());
 		pack.remoteEndpointServiceName = sendObjName(span.remoteServiceName());
 		pack.localEndpointIp = localEndPoint != null ? localEndPoint.ipv4Bytes() : null;
@@ -235,5 +285,20 @@ public class DataProxy {
 		pack.tags = MapValue.ofStringValueMap(span.tags());
 
 		return pack;
+	}
+
+	public static XLogPack makeXLogPack(SpanPack pack) {
+		XLogPack xlog = new XLogPack();
+		xlog.endTime = pack.timestamp + pack.elapsed;
+		xlog.objHash = pack.objHash;
+		xlog.service = pack.name;
+		xlog.txid = pack.txid;
+		xlog.gxid = pack.gxid;
+		xlog.caller = pack.caller;
+		xlog.elapsed = pack.elapsed;
+		xlog.error = pack.error;
+		xlog.xType = XLogTypes.ZIPKIN_SPAN;
+
+		return xlog;
 	}
 }
