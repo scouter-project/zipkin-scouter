@@ -30,6 +30,7 @@ import zipkin2.storage.scouter.udp.net.DataProxy;
 
 import java.io.IOException;
 import java.net.DatagramSocket;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -135,7 +136,7 @@ public final class ScouterUDPStorage extends StorageComponent implements SpanSto
         @Override
         public ScouterUDPStorage build() {
             if (config == null) {
-                config = new ScouterConfig("127.0.0.1", 6100, 60000);
+                config = new ScouterConfig("127.0.0.1", 6100, 60000, new HashMap<>(), null);
             }
 
             return new ScouterUDPStorage(config);
@@ -161,7 +162,7 @@ public final class ScouterUDPStorage extends StorageComponent implements SpanSto
 
         @Override
         protected Void doExecute() throws IOException {
-            DataProxy.sendSpanContainer(spans, config.getUdpPacketMaxBytes());
+            DataProxy.sendSpanContainer(spans, config);
             return null;
         }
 

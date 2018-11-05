@@ -23,10 +23,13 @@ import zipkin2.storage.scouter.udp.ScouterConfig;
 import zipkin2.storage.scouter.udp.ScouterUDPStorage;
 
 import java.io.Serializable;
+import java.util.Map;
+import java.util.logging.Logger;
 
 @ConfigurationProperties("zipkin.storage.scouter")
 public class ZipkinScouterStorageProperties implements Serializable {
     private static final long serialVersionUID = 0L;
+    private static final Logger logger = Logger.getLogger(ZipkinScouterStorageProperties.class.getName());
 
     /**
      * Scouter Collector UDP address; defaults to localhost:6100
@@ -34,6 +37,8 @@ public class ZipkinScouterStorageProperties implements Serializable {
     private String scouterCollectorAddress;
     private int scouterCollectorPort;
     private int scouterUdpPacketMaxBytes;
+    private Map<String, String> tagMap;
+    private String serviceMapsToObjType;
 
     public String getScouterCollectorAddress() {
         return scouterCollectorAddress;
@@ -56,8 +61,26 @@ public class ZipkinScouterStorageProperties implements Serializable {
         this.scouterUdpPacketMaxBytes = scouterUdpPacketMaxBytes;
     }
 
+    public Map<String, String> getTagMap() {
+        return tagMap;
+    }
+
+    public void setTagMap(Map<String, String> tagMap) {
+        this.tagMap = tagMap;
+    }
+
+    public String getServiceMapsToObjType() {
+        return serviceMapsToObjType;
+    }
+
+    public void setServiceMapsToObjType(String serviceMapsToObjType) {
+        this.serviceMapsToObjType = serviceMapsToObjType;
+    }
+
     public ScouterUDPStorage.Builder toBuilder() {
-        ScouterConfig config = new ScouterConfig(scouterCollectorAddress, scouterCollectorPort, scouterUdpPacketMaxBytes);
+        logger.info("[zipkin-scouter-storage] loading.");
+        ScouterConfig config = new ScouterConfig(scouterCollectorAddress, scouterCollectorPort, scouterUdpPacketMaxBytes, tagMap, serviceMapsToObjType);
+        logger.info("[zipkin-scouter-storage] config " + config.toString());
         ScouterUDPStorage.Builder builder = ScouterUDPStorage.newBuilder();
         if (scouterCollectorAddress != null) builder.config(config);
         return builder;

@@ -7,3 +7,14 @@ zipkin:
       # Scouter collector port
       scouter-collector-port: ${SCOUTER_COLLECTOR_PORT:6100}
       scouter-udp-packet-max-bytes: ${SCOUTER_UDP_PACKET_MAX_BYTES:60000}
+      tag-map:
+        text1: ${SCOUTER_TAG_MAP_TEXT1:spring.instance_id}
+        text2: ${SCOUTER_TAG_MAP_TEXT2:}
+        text3: ${SCOUTER_TAG_MAP_TEXT3:}
+        text4: ${SCOUTER_TAG_MAP_TEXT4:}
+        text5: ${SCOUTER_TAG_MAP_TEXT5:}
+        login: ${SCOUTER_TAG_MAP_LOGIN:spring.instance_id}
+        desc: ${SCOUTER_TAG_MAP_DESC:}
+      # map a service to scouter objType (ex: system1=system1,system2=system2 ...). defaultly use the same name of service with $z as the objType.
+      service-maps-to-obj-type: ${SCOUTER_SERVICE_MAPS_OJB_TYPE:svc1=ss1,svc2=ss2}
+
