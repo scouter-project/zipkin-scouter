@@ -31,11 +31,11 @@ wget -O zipkin.jar 'https://search.maven.org/remote_content?g=io.zipkin.java&a=z
 ```
 
 ### Step 2: Download the latest zipkin-storage-scouter jar
-Download the [latest released Scouter module](https://search.maven.org/remote_content?g=io.github.scouter-project&a=zipkin-autoconfigure-scouter&v=LATEST) as zipkin-storage-scouter.jar:
+Download the [latest released Scouter module](https://search.maven.org/remote_content?g=io.github.scouter-project&a=zipkin-autoconfigure-storage-scouter-udp&v=LATEST&c=module) as zipkin-storage-scouter.jar:
 
 ```
 cd /tmp
-wget -O zipkin-storage-scouter.jar 'https://search.maven.org/remote_content?g=io.github.scouter-project&a=zipkin-autoconfigure-scouter&v=LATEST'
+wget -O zipkin-storage-scouter.jar 'https://search.maven.org/remote_content?g=io.github.scouter-project&a=zipkin-autoconfigure-storage-scouter-udp&v=LATEST&c=module'
 ```
 
 ### Step 3: Run the server with the "scouter" profile active
@@ -46,7 +46,8 @@ short environment variables similar to other [Zipkin integrations](https://githu
 cd /tmp
 SCOUTER_COLLECTOR_ADDR=127.0.0.1 \
 SCOUTER_COLLECTOR_PORT=6100 \
-java -Dloader.path=zipkin-storage-scouter.jar -Dspring.profiles.active=scouter -cp zipkin.jar org.springframework.boot.loader.PropertiesLauncher
+STORAGE_TYPE=scouter \
+java -Dloader.path='zipkin-storage-scouter.jar,zipkin-storage-scouter.jar!lib' -Dspring.profiles.active=scouter -cp zipkin.jar org.springframework.boot.loader.PropertiesLauncher
 ```
 * **NOTE:** Make sure the parameters are defined in the same line or use environment variables **
 
