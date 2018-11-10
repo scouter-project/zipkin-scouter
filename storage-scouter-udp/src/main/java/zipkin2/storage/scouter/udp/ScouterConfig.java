@@ -71,6 +71,10 @@ public final class ScouterConfig {
         return udpPacketMaxBytes;
     }
 
+    public Map<String, String> getSeviceToObjTypeMap() {
+        return seviceToObjTypeMap;
+    }
+
     public String getLoginTag() {
         return loginTag;
     }

@@ -97,16 +97,14 @@ public class UDPDataSendThread extends Thread {
 		for (int k = 0; k < size; k++) {
 			byte[] b = queue.pop();
 			if (bytes + b.length >= config.getUdpPacketMaxBytes()) {
-				send(udp, buff); //buff.size가 0일수도 있다.
-				bytes = 0;// bytes 값 초기화..
+				send(udp, buff);
+				bytes = 0;
 				buff.clear();
 			}
 			bytes += b.length;
 			buff.add(b);
 		}
-
 		send(udp, buff);
-
 	}
 
 	public void send(DataUdpAgent udp, List<byte[]> buff) {

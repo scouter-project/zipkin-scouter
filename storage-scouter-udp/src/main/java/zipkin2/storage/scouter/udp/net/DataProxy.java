@@ -341,10 +341,35 @@ public class DataProxy {
             xlog.login = sendLogin(pack.tags.getText(loginTag));
         }
 
+        String descTag = conf.getDescTag();
+        if (StringUtil.isNotEmpty(descTag) && StringUtil.isNotEmpty(pack.tags.getText(descTag))) {
+            xlog.desc = sendLogin(pack.tags.getText(descTag));
+        }
+
         String text1Tag = conf.getText1Tag();
         if (StringUtil.isNotEmpty(text1Tag) && StringUtil.isNotEmpty(pack.tags.getText(text1Tag))) {
             xlog.text1 = pack.tags.getText(text1Tag);
         }
+
+        String text2Tag = conf.getText2Tag();
+        if (StringUtil.isNotEmpty(text2Tag) && StringUtil.isNotEmpty(pack.tags.getText(text2Tag))) {
+            xlog.text2 = pack.tags.getText(text2Tag);
+        }
+
+        String text3Tag = conf.getText3Tag();
+        if (StringUtil.isNotEmpty(text3Tag) && StringUtil.isNotEmpty(pack.tags.getText(text3Tag))) {
+            xlog.text3 = pack.tags.getText(text3Tag);
+        }
+
+        String text4Tag = conf.getText4Tag();
+        if (StringUtil.isNotEmpty(text4Tag) && StringUtil.isNotEmpty(pack.tags.getText(text4Tag))) {
+            xlog.text4 = pack.tags.getText(text4Tag);
+        }
+        String text5Tag = conf.getText5Tag();
+        if (StringUtil.isNotEmpty(text5Tag) && StringUtil.isNotEmpty(pack.tags.getText(text5Tag))) {
+            xlog.text5 = pack.tags.getText(text5Tag);
+        }
+
 
         return xlog;
     }
