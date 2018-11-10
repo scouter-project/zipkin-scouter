@@ -23,7 +23,7 @@ public class ScouterConstants {
 
     public static String toScouterObjType(String name, ScouterConfig conf) {
         if (StringUtil.isNotEmpty(name)) {
-            Map<String, String> serviceToType = conf.getSeviceToObjTypeMap();
+            Map<String, String> serviceToType = conf.getServiceToObjTypeMap();
             return OBJ_TYPE_PREFIX + serviceToType.getOrDefault(name, name);
         } else {
             return "zipkin";

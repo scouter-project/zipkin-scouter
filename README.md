@@ -20,7 +20,7 @@ $ java -Dloader.path=zipkin-storage-scouter.jar -Dspring.profiles.active=scouter
 
 ## Example integrating the Scouter Collector
 
-Here's an example of integrating the SQS Collector.
+Here's an example of integrating the scouter Collector.
 
 ### Step 1: Download zipkin-server jar
 Download the [latest released server](https://search.maven.org/remote_content?g=io.zipkin.java&a=zipkin-server&v=LATEST&c=exec) as zipkin.jar:
@@ -35,7 +35,7 @@ Download the [latest released Scouter module](https://search.maven.org/remote_co
 
 ```
 cd /tmp
-wget -O zipkin-storage-scouter.jar 'https://search.maven.org/remote_content?g=io.zipkin.aws&a=zipkin-autoconfigure-collector-sqs&v=LATEST&c=module'
+wget -O zipkin-storage-scouter.jar 'https://search.maven.org/remote_content?g=io.github.scouter-project&a=zipkin-autoconfigure-scouter&v=LATEST'
 ```
 
 ### Step 3: Run the server with the "scouter" profile active
@@ -51,15 +51,15 @@ java -Dloader.path=zipkin-storage-scouter.jar -Dspring.profiles.active=scouter -
 * **NOTE:** Make sure the parameters are defined in the same line or use environment variables **
 
 * Configures
-  * SCOUTER_COLLECTOR_ADDR (default: 127.0.0.1) : Scouter collector IP 
-  * SCOUTER_COLLECTOR_PORT (default: 6100) : Scounter collector Port
-  * SCOUTER_UDP_PACKET_MAX_BYTES (default: 60000) : should be smaller than OS UDP diagram size.  
-  * SCOUTER_TAG_MAP_TEXT1 : tag mapping to scouter xlog's predefined column `text1`
-  * SCOUTER_TAG_MAP_TEXT2 : tag mapping to scouter xlog's predefined column `text2`
-  * SCOUTER_TAG_MAP_TEXT3 : tag mapping to scouter xlog's predefined column `text3`
-  * SCOUTER_TAG_MAP_TEXT4 : tag mapping to scouter xlog's predefined column `text4`
-  * SCOUTER_TAG_MAP_TEXT5 : tag mapping to scouter xlog's predefined column `text5`
-  * SCOUTER_TAG_MAP_LOGIN : tag mapping to scouter xlog's predefined dictionary encoded column `login`
-  * SCOUTER_TAG_MAP_DESC :tag mapping to scouter xlog's predefined dictionary encoded column `desc`
-  * SCOUTER_SERVICE_MAPS_OJB_TYPE : 
+  * `SCOUTER_COLLECTOR_ADDR` (default: 127.0.0.1) : Scouter collector IP 
+  * `SCOUTER_COLLECTOR_PORT` (default: 6100) : Scounter collector Port
+  * `SCOUTER_UDP_PACKET_MAX_BYTES` (default: 60000) : should be smaller than OS UDP diagram size.  
+  * `SCOUTER_TAG_MAP_TEXT1` : tag mapping to scouter xlog's predefined column `text1`
+  * `SCOUTER_TAG_MAP_TEXT2` : tag mapping to scouter xlog's predefined column `text2`
+  * `SCOUTER_TAG_MAP_TEXT3` : tag mapping to scouter xlog's predefined column `text3`
+  * `SCOUTER_TAG_MAP_TEXT4` : tag mapping to scouter xlog's predefined column `text4`
+  * `SCOUTER_TAG_MAP_TEXT5` : tag mapping to scouter xlog's predefined column `text5`
+  * `SCOUTER_TAG_MAP_LOGIN` : tag mapping to scouter xlog's predefined dictionary encoded column `login`
+  * `SCOUTER_TAG_MAP_DESC` : tag mapping to scouter xlog's predefined dictionary encoded column `desc`
+  * `SCOUTER_SERVICE_MAPS_OJB_TYPE` : map a zipkin's local endpoint service name to a scouter objType (ex: system1=OrderSystem,system2=CustomerSystem ...). It use the same name of service name with preceding $z.  
 
