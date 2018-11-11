@@ -13,10 +13,6 @@ To integrate a module with a Zipkin server, you need to:
 
 Each module will also have different minimum variables that need to be set.
 
-Ex.
-```
-$ java -Dloader.path=zipkin-storage-scouter.jar -Dspring.profiles.active=scouter -cp zipkin.jar org.springframework.boot.loader.PropertiesLauncher
-```
 
 ## Example integrating the Scouter Collector
 
