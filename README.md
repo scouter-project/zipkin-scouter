@@ -1,5 +1,6 @@
 # zipkin-scouter
-Zikpin Scouter UDP storage and other zipkin-scouter integrations.
+Zipkin Scouter UDP storage and other zipkin-scouter integrations.
+* Supported scouter collector version : `v2.5+`
 
 ## Server integration
 In order to integrate with zipkin-server, you need to use properties
@@ -14,7 +15,7 @@ To integrate a module with a Zipkin server, you need to:
 Each module will also have different minimum variables that need to be set.
 
 
-## Example integrating the Scouter Collector
+## Example integrating the Scouter Collector by Zipkin-Scouter-Storage
 
 Here's an example of integrating the scouter Collector.
 
@@ -48,15 +49,20 @@ java -Dloader.path='zipkin-storage-scouter.jar,zipkin-storage-scouter.jar!lib' -
 * **NOTE:** Make sure the parameters are defined in the same line or use environment variables **
 
 * Configures
+  * `STORAGE_TYPE=scouter` : **required**. All others are optional.
   * `SCOUTER_COLLECTOR_ADDR` (default: 127.0.0.1) : Scouter collector IP 
   * `SCOUTER_COLLECTOR_PORT` (default: 6100) : Scounter collector Port
   * `SCOUTER_UDP_PACKET_MAX_BYTES` (default: 60000) : should be smaller than OS UDP diagram size.  
-  * `SCOUTER_TAG_MAP_TEXT1` : tag mapping to scouter xlog's predefined column `text1`
-  * `SCOUTER_TAG_MAP_TEXT2` : tag mapping to scouter xlog's predefined column `text2`
-  * `SCOUTER_TAG_MAP_TEXT3` : tag mapping to scouter xlog's predefined column `text3`
-  * `SCOUTER_TAG_MAP_TEXT4` : tag mapping to scouter xlog's predefined column `text4`
-  * `SCOUTER_TAG_MAP_TEXT5` : tag mapping to scouter xlog's predefined column `text5`
-  * `SCOUTER_TAG_MAP_LOGIN` : tag mapping to scouter xlog's predefined dictionary encoded column `login`
-  * `SCOUTER_TAG_MAP_DESC` : tag mapping to scouter xlog's predefined dictionary encoded column `desc`
-  * `SCOUTER_SERVICE_MAPS_OJB_TYPE` : map a zipkin's local endpoint service name to a scouter objType (ex: system1=OrderSystem,system2=CustomerSystem ...). It use the same name of service name with preceding $z.  
+  * `SCOUTER_TAG_MAP_TEXT1` : tag mapping to scouter xlog's predefined column `text1` (default: `spring.instance_id`) (comma separated multi-tags supported.)
+  * `SCOUTER_TAG_MAP_TEXT2` : tag mapping to scouter xlog's predefined column `text2` (comma separated multi-tags supported.)
+  * `SCOUTER_TAG_MAP_TEXT3` : tag mapping to scouter xlog's predefined column `text3` (comma separated multi-tags supported.)
+  * `SCOUTER_TAG_MAP_TEXT4` : tag mapping to scouter xlog's predefined column `text4` (comma separated multi-tags supported.)
+  * `SCOUTER_TAG_MAP_TEXT5` : tag mapping to scouter xlog's predefined column `text5` (comma separated multi-tags supported.)
+  * `SCOUTER_TAG_MAP_LOGIN` : tag mapping to scouter xlog's predefined dictionary encoded column `login` (just single first matching tag of comma separated tags is used for the column.)
+  * `SCOUTER_TAG_MAP_DESC` : tag mapping to scouter xlog's predefined dictionary encoded column `desc` (just single first matching tag of comma separated tags is used for the column.)
+  * `SCOUTER_SERVICE_MAPS_OJB_TYPE` : map a zipkin's local endpoint service name to a scouter objType (ex: system1:OrderSystem,system2:CustomerSystem ...). It use the same name of service name with preceding $z.
+  * `SCOUTER_DEBUG` (default: false) : Debug option  
 
+### Limitation
+This currently only supports sending to a Scouter collector, not reading back spans from the service.  
+Spans can be shown in the Scouter's XLog view.

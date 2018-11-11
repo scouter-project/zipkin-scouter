@@ -27,6 +27,7 @@ import java.util.stream.Stream;
 import static java.util.stream.Collectors.toMap;
 
 public final class ScouterConfig {
+    boolean debug;
     String address;
     int port;
     int udpPacketMaxBytes;
@@ -39,8 +40,9 @@ public final class ScouterConfig {
     String text5Tag;
     Map<String, String> seviceToObjTypeMap = new HashMap<>();
 
-    public ScouterConfig(String address, int port, int udpPacketMaxBytes,
+    public ScouterConfig(boolean debug, String address, int port, int udpPacketMaxBytes,
                          Map<String, String> tagMap, String serviceMapsToObjType) {
+        this.debug = debug;
         this.address = address;
         this.port = port;
         this.udpPacketMaxBytes = udpPacketMaxBytes;
@@ -54,9 +56,13 @@ public final class ScouterConfig {
 
         if (StringUtil.isNotEmpty(serviceMapsToObjType)) {
             seviceToObjTypeMap = Stream.of(serviceMapsToObjType.split(","))
-                    .map(str -> str.split("="))
+                    .map(str -> str.split(":"))
                     .collect(toMap(kv -> kv[0], kv -> kv[1]));
         }
+    }
+
+    public boolean isDebug() {
+        return debug;
     }
 
     public String getAddress() {
@@ -109,6 +115,7 @@ public final class ScouterConfig {
                 "address='" + address + '\'' +
                 ", port=" + port +
                 ", udpPacketMaxBytes=" + udpPacketMaxBytes +
+                ", debug=" + debug +
                 ", loginTag='" + loginTag + '\'' +
                 ", descTag='" + descTag + '\'' +
                 ", text1Tag='" + text1Tag + '\'' +

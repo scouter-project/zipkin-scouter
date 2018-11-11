@@ -41,9 +41,9 @@ import zipkin2.storage.scouter.ScouterConstants;
 import zipkin2.storage.scouter.udp.ScouterConfig;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -72,7 +72,6 @@ public class DataProxy {
             return hash;
         }
         sqlText.put(hash);
-        // udp.add(new TextPack(TextTypes.SQL, hash, sql));
         sendDirect(new TextPack(TextTypes.SQL, hash, sql));
         return hash;
     }
@@ -143,6 +142,10 @@ public class DataProxy {
 
         objSentMap.put(objHash, now);
         sendHeartBeat(p);
+
+        if (conf.isDebug()) {
+            logger.info("Object heartbeat: " + p);
+        }
     }
 
     public static void sendHeartBeat(ObjectPack p) {
@@ -202,9 +205,6 @@ public class DataProxy {
 
     public static void sendXLog(XLogPack p) {
         sendDirect(p);
-        if (logger.isLoggable(Level.FINE)) {
-            logger.log(Level.FINE, p.toString());
-        }
     }
 
     static DataUdpAgent udpNet = DataUdpAgent.getInstance();
@@ -248,6 +248,10 @@ public class DataProxy {
             List<SpanPack> spanPacks = spanList.stream()
                     .map(DataProxy::makeSpanPack).collect(Collectors.toList());
 
+            if (conf.isDebug()) {
+                spanPacks.forEach(pack -> logger.info("SpanPack generated: " + pack.toString()));
+            }
+
             List<byte[]> spansBytesList = SpanPack.toBytesList(spanPacks, udpMaxBytes);
             for (byte[] spansBytes : spansBytesList) {
                 containerPack.spans = spansBytes;
@@ -256,7 +260,11 @@ public class DataProxy {
 
             for (SpanPack spanPack : spanPacks) {
                 if (SpanTypes.isXLoggable(spanPack.spanType)) {
-                    sendXLog(makeXLogPack(spanPack, conf));
+                    XLogPack xlogPack = makeXLogPack(spanPack, conf);
+                    if (conf.isDebug()) {
+                        logger.info("XLog generated: " + xlogPack);
+                    }
+                    sendXLog(xlogPack);
                 }
             }
         }
@@ -336,41 +344,41 @@ public class DataProxy {
         xlog.error = pack.error;
         xlog.xType = XLogTypes.ZIPKIN_SPAN;
 
-        String loginTag = conf.getLoginTag();
-        if (StringUtil.isNotEmpty(loginTag) && StringUtil.isNotEmpty(pack.tags.getText(loginTag))) {
-            xlog.login = sendLogin(pack.tags.getText(loginTag));
+        String loginColumnString = map1stMatchingTagNames(pack, conf.getLoginTag());
+        if (StringUtil.isNotEmpty(loginColumnString)) {
+            xlog.login = sendLogin(loginColumnString);
+        }
+        String descColumnString = map1stMatchingTagNames(pack, conf.getDescTag());
+        if (StringUtil.isNotEmpty(descColumnString)) {
+            xlog.desc = sendLogin(descColumnString);
         }
 
-        String descTag = conf.getDescTag();
-        if (StringUtil.isNotEmpty(descTag) && StringUtil.isNotEmpty(pack.tags.getText(descTag))) {
-            xlog.desc = sendLogin(pack.tags.getText(descTag));
-        }
-
-        String text1Tag = conf.getText1Tag();
-        if (StringUtil.isNotEmpty(text1Tag) && StringUtil.isNotEmpty(pack.tags.getText(text1Tag))) {
-            xlog.text1 = pack.tags.getText(text1Tag);
-        }
-
-        String text2Tag = conf.getText2Tag();
-        if (StringUtil.isNotEmpty(text2Tag) && StringUtil.isNotEmpty(pack.tags.getText(text2Tag))) {
-            xlog.text2 = pack.tags.getText(text2Tag);
-        }
-
-        String text3Tag = conf.getText3Tag();
-        if (StringUtil.isNotEmpty(text3Tag) && StringUtil.isNotEmpty(pack.tags.getText(text3Tag))) {
-            xlog.text3 = pack.tags.getText(text3Tag);
-        }
-
-        String text4Tag = conf.getText4Tag();
-        if (StringUtil.isNotEmpty(text4Tag) && StringUtil.isNotEmpty(pack.tags.getText(text4Tag))) {
-            xlog.text4 = pack.tags.getText(text4Tag);
-        }
-        String text5Tag = conf.getText5Tag();
-        if (StringUtil.isNotEmpty(text5Tag) && StringUtil.isNotEmpty(pack.tags.getText(text5Tag))) {
-            xlog.text5 = pack.tags.getText(text5Tag);
-        }
-
+        xlog.text1 = mapTagNames(pack, conf.getText1Tag());
+        xlog.text2 = mapTagNames(pack, conf.getText2Tag());
+        xlog.text3 = mapTagNames(pack, conf.getText3Tag());
+        xlog.text4 = mapTagNames(pack, conf.getText4Tag());
+        xlog.text5 = mapTagNames(pack, conf.getText5Tag());
 
         return xlog;
+    }
+
+    protected static String map1stMatchingTagNames(SpanPack pack, String tagNames) {
+        if (StringUtil.isEmpty(tagNames)) {
+            return null;
+        }
+        return Arrays.stream(tagNames.split(","))
+                .map(tag -> pack.tags.getText(tag))
+                .filter(StringUtil::isNotEmpty)
+                .findFirst().orElse(null);
+    }
+
+    protected static String mapTagNames(SpanPack pack, String tagNames) {
+        if (StringUtil.isEmpty(tagNames)) {
+            return null;
+        }
+        return Arrays.stream(tagNames.split(","))
+                .map(tag -> pack.tags.getText(tag))
+                .filter(StringUtil::isNotEmpty)
+                .collect(Collectors.joining(","));
     }
 }

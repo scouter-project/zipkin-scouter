@@ -22,8 +22,8 @@ public class ScouterConstantsTest {
 
     @Test
     public void toScouterObjType() {
-        ScouterConfig config = new ScouterConfig("localhost", 6100, 60000,
-                new HashMap<>(), "s1=xxs1,s2=xxs2");
+        ScouterConfig config = new ScouterConfig(false, "localhost", 6100, 60000,
+                new HashMap<>(), "s1:xxs1,s2:xxs2");
 
         assertEquals("z$nomap", ScouterConstants.toScouterObjType("nomap", config));
         assertEquals("z$xxs1", ScouterConstants.toScouterObjType("s1", config));

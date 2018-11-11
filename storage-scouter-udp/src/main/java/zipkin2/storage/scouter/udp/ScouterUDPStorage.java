@@ -36,6 +36,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public final class ScouterUDPStorage extends StorageComponent implements SpanStore, SpanConsumer {
+    private static final Logger logger = Logger.getLogger(ScouterUDPStorage.class.getName());
     private static ScouterConfig config;
 
     public static Builder newBuilder() {
@@ -65,8 +66,9 @@ public final class ScouterUDPStorage extends StorageComponent implements SpanSto
 
     @Override
     public Call<Void> accept(List<Span> spans) {
-        System.out.println(spans);
-
+        if (config.isDebug()) {
+            logger.info("SPANS received : " + spans);
+        }
         if (closeCalled) throw new IllegalStateException("closed");
         if (spans.isEmpty()) return Call.create(null);
         return new UDPCall(spans);
@@ -136,7 +138,7 @@ public final class ScouterUDPStorage extends StorageComponent implements SpanSto
         @Override
         public ScouterUDPStorage build() {
             if (config == null) {
-                config = new ScouterConfig("127.0.0.1", 6100, 60000, new HashMap<>(), null);
+                config = new ScouterConfig(false, "127.0.0.1", 6100, 60000, new HashMap<>(), null);
             }
 
             return new ScouterUDPStorage(config);

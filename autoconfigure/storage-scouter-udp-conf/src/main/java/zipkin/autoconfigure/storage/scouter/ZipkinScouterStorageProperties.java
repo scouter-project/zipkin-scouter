@@ -34,11 +34,19 @@ public class ZipkinScouterStorageProperties implements Serializable {
     /**
      * Scouter Collector UDP address; defaults to localhost:6100
      */
+    private boolean debug;
     private String scouterCollectorAddress;
     private int scouterCollectorPort;
     private int scouterUdpPacketMaxBytes;
     private Map<String, String> tagMap;
     private String serviceMapsToObjType;
+
+    public boolean isDebug() {
+        return debug;
+    }
+    public void setDebug(boolean debug) {
+        this.debug = debug;
+    }
 
     public String getScouterCollectorAddress() {
         return scouterCollectorAddress;
@@ -79,7 +87,7 @@ public class ZipkinScouterStorageProperties implements Serializable {
 
     public ScouterUDPStorage.Builder toBuilder() {
         logger.info("[zipkin-scouter-storage] loading.");
-        ScouterConfig config = new ScouterConfig(scouterCollectorAddress, scouterCollectorPort, scouterUdpPacketMaxBytes, tagMap, serviceMapsToObjType);
+        ScouterConfig config = new ScouterConfig(debug, scouterCollectorAddress, scouterCollectorPort, scouterUdpPacketMaxBytes, tagMap, serviceMapsToObjType);
         logger.info("[zipkin-scouter-storage] config " + config.toString());
         ScouterUDPStorage.Builder builder = ScouterUDPStorage.newBuilder();
         if (scouterCollectorAddress != null) builder.config(config);

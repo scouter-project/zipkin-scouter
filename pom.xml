@@ -6,8 +6,12 @@
 
     <groupId>io.github.scouter-project</groupId>
     <artifactId>zipkin-scouter-parent</artifactId>
-    <version>0.9.0</version>
+    <version>1.0.0</version>
     <packaging>pom</packaging>
+
+    <name>Zipkin Scouter (Parent)</name>
+    <description>Zipkin Scouter (Parent)</description>
+    <url>https://github.com/scouter-project/zipkin-scouter</url>
 
     <modules>
         <module>storage-scouter-udp</module>
@@ -212,8 +216,7 @@
                     <executions>
                         <execution>
                             <id>sign-artifacts</id>
-                            <!--<phase>deploy</phase>-->
-                            <phase>verify</phase>
+                            <phase>deploy</phase>
                             <goals>
                                 <goal>sign</goal>
                             </goals>

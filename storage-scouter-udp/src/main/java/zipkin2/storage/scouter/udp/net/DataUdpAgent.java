@@ -46,13 +46,15 @@ public class DataUdpAgent {
 
 	private void setTarget() {
 		ScouterConfig config = ScouterUDPStorage.getConfig();
-		String host = config.getAddress();
-		int port = config.getPort();
-		try {
-			serverHost = InetAddress.getByName(host);
-			serverPort = port;
-		} catch (Exception e) {
-			logger.log(Level.WARNING, e.getMessage(), e);
+		if (config != null) {
+			String host = config.getAddress();
+			int port = config.getPort();
+			try {
+				serverHost = InetAddress.getByName(host);
+				serverPort = port;
+			} catch (Exception e) {
+				logger.log(Level.WARNING, e.getMessage(), e);
+			}
 		}
 	}
 	protected void close(DatagramSocket d) {
