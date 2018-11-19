@@ -68,11 +68,9 @@ This currently only supports sending to a Scouter collector, not reading back sp
 Spans can be shown in the Scouter's XLog view.
 
 ### Scouter Links
- - [Scouter GitHub](https://github.com/scouter-project/scouter)
-[![Demo gif](https://github.com/scouter-project/scouter/blob/develop/scouter.document/img/main/scouter-movie.gif?raw=true)](https://youtu.be/iuArTzsD7Ws)
+ - [Scouter GitHub](https://github.com/scouter-project/scouter)  
 
 ### Scouter Paper Links
  - [Scouter Paper Homepage](https://github.com/scouter-project/scouter)
  - **Scouter Paper showcase** : [scouter paper overview (youtube)](https://www.youtube.com/watch?v=NjJ0dGhdIbU)
-[![scouter-paper](https://mindplates.github.io/scouter-paper/img/img12.png)](https://www.youtube.com/watch?v=NjJ0dGhdIbU)
  
