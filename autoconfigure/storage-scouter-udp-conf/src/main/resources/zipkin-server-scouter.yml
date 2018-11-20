@@ -19,6 +19,6 @@ zipkin:
         login: ${SCOUTER_TAG_MAP_LOGIN:}
         desc: ${SCOUTER_TAG_MAP_DESC:}
       # map a service to scouter objType (ex: system1:system1,system2:system2 ...). default use the same name of the zipkin local endpoint service name with preceding $z.
-      service-maps-to-obj-type: ${SCOUTER_SERVICE_MAPS_OJB_TYPE:svc1=ss1,svc2=ss2}
+      service-maps-to-obj-type: ${SCOUTER_SERVICE_MAPS_OJB_TYPE:}
 
 
