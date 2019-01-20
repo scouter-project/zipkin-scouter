@@ -45,12 +45,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class DataProxy {
     private static final Logger logger = Logger.getLogger(DataProxy.class.getName());
     private static UDPDataSendThread udpCollect = UDPDataSendThread.getInstance();
     private static IntIntLinkedMap sqlHash = new IntIntLinkedMap().setMax(5000);
+    private static final Pattern WHITE_SPACE = Pattern.compile("\\s\\s+");
 
     private static int getSqlHash(String sql) {
         if (sql.length() < 100)
@@ -298,7 +300,6 @@ public class DataProxy {
             }
         }
 
-        pack.name = sendServiceName(span.name());
         String error = span.tags().get("error");
         if (StringUtil.isNotEmpty(error)) {
             pack.error = sendError(error);
@@ -328,6 +329,17 @@ public class DataProxy {
         }
 
         pack.tags = MapValue.ofStringValueMap(span.tags());
+
+        String serviceName = StringUtil.emptyToDefault(span.name(), "").trim();
+        if (pack.spanType == SpanTypes.CLIENT) {
+            if (pack.tags.getText("sql.query") != null) {
+                //serviceName = pack.tags.getText("sql.query").replaceAll("[\r\n]+", " ");
+                serviceName = WHITE_SPACE.matcher(pack.tags.getText("sql.query")).replaceAll(" ");
+            } else if (pack.tags.getText("http.path") != null) {
+                serviceName = pack.tags.getText("http.method") + " " + pack.tags.getText("http.path");
+            }
+        }
+        pack.name = sendServiceName(serviceName);
 
         return pack;
     }
