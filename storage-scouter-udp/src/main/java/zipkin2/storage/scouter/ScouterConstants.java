@@ -15,7 +15,7 @@ public class ScouterConstants {
 
     public static String toScouterObjName(String name) {
         if (StringUtil.isNotEmpty(name)) {
-            return OBJ_PREFIX + name;
+            return name.indexOf("/") == -1 ? OBJ_PREFIX + name : name.substring(0, name.indexOf("/")).toUpperCase() + name.substring(name.indexOf("/"));
         } else {
             return OBJ_PREFIX + UNKNOWN;
         }

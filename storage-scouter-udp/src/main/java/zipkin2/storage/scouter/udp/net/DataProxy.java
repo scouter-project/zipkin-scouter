@@ -133,7 +133,7 @@ public class DataProxy {
         }
 
         ObjectPack p = new ObjectPack();
-        p.objType = ScouterConstants.toScouterObjType(span.localServiceName(), conf);
+        p.objType = "zipkin";
         p.objName = objName;
         p.objHash = objHash;
         if (span.localEndpoint() != null) {
